@@ -3,15 +3,60 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { generateVocabData } from "@/lib/ai";
+import { generateVocabData as generateVocabDataFromAI, generateVocabSet, type VocabWord } from "@/lib/ai";
 
-// ทดสอบ AI เดี๋ยวมาลบออก
-export async function testAI(word: string) {
-  const data = await generateVocabData(word);
-  console.log("🤖 AI Answer:", data);
+// Re-export type เพื่อให้ components ใช้ได้
+export type { VocabWord };
+
+// ฟังก์ชัน wrapper สำหรับเรียก AI และตรวจสอบ authentication
+export async function generateVocabData(word: string): Promise<{
+  definition: string;
+  category: string;
+  example: string;
+} | null> {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("คุณต้องล็อกอินก่อนจึงจะสามารถจดศัพท์ได้!");
+  }
+
+  const data = await generateVocabDataFromAI(word);
   return data;
 }
+
+export async function generateTopicAction(topic: string): Promise<VocabWord[]> {
+  const { userId } = await auth();
+  if (!userId) {
+    throw new Error("คุณต้องล็อกอินก่อนจึงจะสามารถจดศัพท์ได้!");    
+  }
+
+  const aiWords = await generateVocabSet(topic, 10) as VocabWord[];
+
+  if (!aiWords || aiWords.length === 0) return [];
+
+  // ดึงคำศัพท์ที่มีอยู่แล้วในฐานข้อมูล
+  const existingVocabs = await prisma.vocab.findMany({
+    where: {
+      userId: userId,
+      word: {
+        in: aiWords.map((w) => w.word),
+      },
+    },
+    select: {
+      word: true,
+    },
+  });
+  
+  // สร้าง Set เพื่อให้เช็คง่ายๆ (เช่น { "apple", "banana" })
+  const existingSet = new Set(existingVocabs.map(v => v.word.toLowerCase()));
+
+  // กรองคำซ้ำทิ้ง!
+  const newWords = aiWords.filter((w) => !existingSet.has(w.word.toLowerCase()));
+
+  // ส่งกลับไปแค่ 5 คำแรก (หรือตามจำนวนที่เหลือ)
+  return newWords.slice(0, 5);
+}
+
+
 
 // ฟังก์ชันนี้รับ FormData (ข้อมูลดิบจากฟอร์ม HTML)
 export async function addVocab(formData: FormData) {

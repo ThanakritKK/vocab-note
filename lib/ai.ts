@@ -1,5 +1,13 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+// Type สำหรับ vocab word ที่ได้จาก AI
+export type VocabWord = {
+  word: string;
+  definition: string;
+  category: string;
+  example: string;
+};
+
 // 1. อ่าน API Key
 const apiKey = process.env.GEMINI_API_KEY;
 
@@ -39,5 +47,34 @@ export async function generateVocabData(word: string) {
   } catch (error) {
     console.error("AI Error:", error);
     return null;
+  }
+}
+
+export async function generateVocabSet(topic: string, count: number = 5) {
+  const prompt = `
+    Act as a vocabulary tutor. Generate ${count} English vocabulary words related to the topic: "${topic}".
+    
+    Return ONLY a JSON Array with this format (no markdown):
+    [
+      {
+        "word": "Word1",
+        "definition": "Definition in Thai",
+        "category": "One of: General, Noun, Verb, Adjective, Mindset, Tech, Soft Skill",
+        "example": "Example sentence"
+      },
+      ...
+    ]
+  `;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    const cleanText = text.replace(/```json|```/g, "").trim();
+    
+    return JSON.parse(cleanText) as VocabWord[];
+  } catch (error) {
+    console.error("AI Set Error:", error);
+    return [];
   }
 }

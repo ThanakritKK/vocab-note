@@ -5,9 +5,11 @@ import { auth } from "@clerk/nextjs/server";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
 import Pagination from "@/components/Pagination";
+import TopicGenerator from "@/components/TopicGenerator";
 
 
-const ITEMS_PER_PAGE = 6;
+
+const ITEMS_PER_PAGE = 3;
 
 export default async function Home(props: { 
   searchParams?: Promise<{
@@ -60,7 +62,7 @@ export default async function Home(props: {
     <div className="flex flex-col items-center p-12 gap-6 bg-gray-50 h-full min-h-screen">
 
       <VocabForm />
-
+      <TopicGenerator />
       <div className="relative w-full max-w-sm">
         <SearchBar />
         <CategoryFilter />
