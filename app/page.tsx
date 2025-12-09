@@ -4,21 +4,28 @@ import { prisma } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
+import Pagination from "@/components/Pagination";
+
+
+const ITEMS_PER_PAGE = 2;
 
 export default async function Home(props: { 
   searchParams?: Promise<{
      query?: string;
      category?: string;
+     page?: string;
      }>;
      }) {
 
       const searchParams = await props.searchParams;
       const query = searchParams?.query || "";
       const category = searchParams?.category || "";
+      const currentPage = Number(searchParams?.page) || 1;
+  
 
   const { userId } = await auth();
-
   if (!userId) {
+
     return (
       <div className="flex flex-col items-center p-12 gap-6 bg-gray-50 h-full min-h-screen justify-center">
         <h1 className="text-3xl font-bold">กรุณาล็อกอินเพื่อเริ่มใช้งาน</h1>
@@ -26,21 +33,27 @@ export default async function Home(props: {
     );
   }
 
+  const whereCondition = {
+    userId: userId,
+    ...(category && category !== "All" ? { category: category } : {}),
+    OR: [
+      { word: { contains: query, mode: "insensitive" as const } }, // ใส่ as const เพื่อแก้ Type Error
+      { definition: { contains: query, mode: "insensitive" as const } },
+    ],
+  };
+
+  const totalItems = await prisma.vocab.count({
+    where: whereCondition,
+  });
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
 
   const vocabList = await prisma.vocab.findMany({
-    where: {
-      userId: userId,
-      ...(category ? { category: category } : {}),
-      ...(query ? {
-        OR: [
-          { word: { contains: query, mode: "insensitive" } },
-          { definition: { contains: query, mode: "insensitive" } }
-        ]
-      } : {})
-    },
+    where: whereCondition,
     orderBy: {
       createdAt: "desc",
     },
+    take: ITEMS_PER_PAGE,
+    skip: (currentPage - 1) * ITEMS_PER_PAGE,
   });
 
   return (
@@ -71,7 +84,11 @@ export default async function Home(props: {
             <p className="text-gray-500 text-center">ยังไม่มีคำศัพท์จ้า เริ่มจดศัพท์เลย!</p>
           </div>
         )}
-      </div>
-    </div>
+        </div>
+
+          <div className="w-full max-w-sm pb-10">
+            <Pagination totalPages={totalPages} />
+          </div>
+        </div>  
   );
 }

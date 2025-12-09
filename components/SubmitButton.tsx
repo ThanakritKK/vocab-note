@@ -2,9 +2,13 @@
 
 import { useFormStatus } from "react-dom"; // Hook ตัวใหม่ของ React สำหรับเช็คสถานะฟอร์ม
 
-export default function SubmitButton() {
+interface SubmitButtonProps {
+  label: string;
+}
+
+export default function SubmitButton({ label }: SubmitButtonProps) {
   // pending = true เมื่อฟอร์มกำลังส่งข้อมูล
-  const { pending } = useFormStatus(); 
+  const { pending } = useFormStatus();  
 
   return (
     <button
@@ -16,7 +20,7 @@ export default function SubmitButton() {
           : "bg-blue-600 hover:bg-blue-700 text-white" // สีปกติ (สีฟ้า)
       }`}
     >
-      {pending ? "กำลังบันทึก..." : "บันทึก"}
+      {pending ? "กำลังบันทึก..." : label}
     </button>
   );
 }

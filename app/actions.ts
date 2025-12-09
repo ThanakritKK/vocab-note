@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 
 // ฟังก์ชันนี้รับ FormData (ข้อมูลดิบจากฟอร์ม HTML)
@@ -50,4 +51,29 @@ export async function deleteVocab(vocabId: number) {
 
   revalidatePath("/");
 
+}
+
+export async function updateVocab(id:number, formData: FormData) {
+
+  const { userId } = await auth();
+  if (!userId) return;
+
+  const word = formData.get("word") as string;
+  const definition = formData.get("definition") as string;
+  const category = formData.get("category") as string;
+
+  await prisma.vocab.update({
+    where: {
+      id: id,
+      userId: userId,
+    },
+    data: {
+      word,
+      definition,
+      category,
+    },
+  });
+
+  revalidatePath("/");
+  redirect("/");
 }
