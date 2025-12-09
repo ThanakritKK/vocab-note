@@ -7,6 +7,9 @@ async function main() {
   await prisma.vocab.deleteMany()
 
   // 2. เพิ่มข้อมูลตัวอย่าง
+  // หมายเหตุ: ใช้ dummy userId สำหรับ seed data (ใน production ควรใช้ userId จริง)
+  const dummyUserId = process.env.SEED_USER_ID || "seed-user-id"
+  
   await prisma.vocab.createMany({
     data: [
       {
@@ -14,30 +17,35 @@ async function main() {
         definition: "ความสามารถในการฟื้นตัวจากความยากลำบาก",
         category: "Mindset",
         isMemorized: false,
+        userId: dummyUserId,
       },
       {
         word: "Pragmatic",
         definition: "เน้นการปฏิบัติจริงมากกว่าทฤษฎี",
         category: "Adjective",
         isMemorized: true,
+        userId: dummyUserId,
       },
       {
         word: "Supabase",
         definition: "Firebase alternative ที่ใช้ PostgreSQL",
         category: "Tech",
         isMemorized: false,
+        userId: dummyUserId,
       },
       {
         word: "Consistency",
         definition: "ความสม่ำเสมอ, ความคงเส้นคงวา (กุญแจสู่ความสำเร็จ)",
         category: "Noun",
         isMemorized: false,
+        userId: dummyUserId,
       },
       {
         word: "Empathy",
         definition: "ความเห็นอกเห็นใจ, การเข้าใจความรู้สึกผู้อื่น",
         category: "Soft Skill",
-        isMemorized: false
+        isMemorized: false,
+        userId: dummyUserId,
       }
     ],
   })

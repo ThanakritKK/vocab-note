@@ -52,7 +52,7 @@ export default function VocabCard({
         <h2 className="text-2xl font-bold text-gray-900">{word}</h2>
 
         {/* ป้ายหมวดหมู่ (Badge) */}
-        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5rounded-full">
+        <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
           {category}
         </span>
       </div>

@@ -31,11 +31,12 @@ export default async function Home(props: {
     where: {
       userId: userId,
       ...(category ? { category: category } : {}),
-
-      OR: [
-        { word: { contains: query, mode: "insensitive" } },
-        { definition: { contains: query, mode: "insensitive" } }
-      ]
+      ...(query ? {
+        OR: [
+          { word: { contains: query, mode: "insensitive" } },
+          { definition: { contains: query, mode: "insensitive" } }
+        ]
+      } : {})
     },
     orderBy: {
       createdAt: "desc",
