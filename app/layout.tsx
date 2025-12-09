@@ -12,6 +12,7 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://vocab-note-xi.vercel.app"),
   title: {
     template: "%s | VocabNote",
     default: "VocabNote - แอปจดศัพท์อัจฉริยะ",

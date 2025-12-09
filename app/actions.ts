@@ -4,7 +4,14 @@ import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { generateVocabData } from "@/lib/ai";
 
+// ทดสอบ AI เดี๋ยวมาลบออก
+export async function testAI(word: string) {
+  const data = await generateVocabData(word);
+  console.log("🤖 AI Answer:", data);
+  return data;
+}
 
 // ฟังก์ชันนี้รับ FormData (ข้อมูลดิบจากฟอร์ม HTML)
 export async function addVocab(formData: FormData) {
@@ -56,7 +63,9 @@ export async function deleteVocab(vocabId: number) {
 export async function updateVocab(id:number, formData: FormData) {
 
   const { userId } = await auth();
-  if (!userId) return;
+  if (!userId) {
+    throw new Error("คุณต้องล็อกอินก่อนจึงจะสามารถแก้ไขศัพท์ได้!");
+  }
 
   const word = formData.get("word") as string;
   const definition = formData.get("definition") as string;
@@ -75,5 +84,5 @@ export async function updateVocab(id:number, formData: FormData) {
   });
 
   revalidatePath("/");
-  redirect("/");
+  revalidatePath(`/vocab/${id}`);
 }

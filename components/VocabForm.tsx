@@ -6,11 +6,13 @@ import SubmitButton from "./SubmitButton";
 import { useRef } from "react";
 import type { Vocab } from "@prisma/client";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 
 
 export default function VocabForm({ vocab }: { vocab?: Vocab }) {
   const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
   const isEditMode = !!vocab;
 
   return (
@@ -21,18 +23,24 @@ export default function VocabForm({ vocab }: { vocab?: Vocab }) {
       <form ref={formRef} 
       action={async (formData: FormData) => {
         try {
-        if (isEditMode) {
-          await updateVocab(vocab.id, formData);
-          toast.success("แก้ไขข้อมูลเรียบร้อย! 🎉");
-        } else {
-          await addVocab(formData);
-          formRef.current?.reset();
-
-          toast.success("จดศัพท์ใหม่เรียบร้อย! 🎉");
+          const word = formData.get("word") as string;
+          
+          if (isEditMode) {
+            await updateVocab(vocab.id, formData);
+            toast.success("บันทึกการแก้ไขเรียบร้อย! 📝");
+            // Redirect กลับหน้าแรกหลังจากแก้ไขเสร็จ
+            setTimeout(() => {
+              router.push("/");
+            }, 500);
+          } else {
+            await addVocab(formData);
+            formRef.current?.reset();
+            toast.success(`เพิ่มคำว่า "${word}" สำเร็จ! 🎉`);
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          toast.error("เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง.");
         }
-      } catch (error) {
-        toast.error("เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง.");
-      }
       }} className="flex flex-col gap-4">
 
         {/* ช่อง Word */}

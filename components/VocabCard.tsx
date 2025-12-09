@@ -7,6 +7,7 @@ import DeleteButton from "./DeleteButton";
 import Swal from "sweetalert2";
 import { PencilIcon } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 type VocabCardProps = Pick<Vocab, "id" | "word" | "definition" | "category">;
 
@@ -45,15 +46,12 @@ export default function VocabCard({
               });
 
               if (result.isConfirmed) {
-                await deleteVocab(id);
-
-                await Swal.fire({
-                  title: "ลบเสร็จสิ้น!",
-                  text: "คำศัพท์ถูกลบเรียบร้อยแล้ว",
-                  icon: "success",
-                  timer: 1500, // ปิดเองใน 1.5 วิ
-                  showConfirmButton: false,
-                });
+                try {
+                  await deleteVocab(id);
+                  toast.success(`ลบคำว่า "${word}" เรียบร้อยแล้ว! 🗑️`);
+                } catch (error) {
+                  toast.error("เกิดข้อผิดพลาด! กรุณาลองใหม่อีกครั้ง.");
+                }
               }
             }}
           >
