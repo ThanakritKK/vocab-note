@@ -6,7 +6,7 @@ import { useRef , useState } from "react";
 import type { Vocab } from "@prisma/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Sparkle , Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 
 
 

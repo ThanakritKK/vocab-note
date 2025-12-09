@@ -19,9 +19,9 @@ export default function VocabCard({
 }: VocabCardProps) {
   return (
     <div className="w-full max-w-sm bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow p-6">
-      {/* ส่วนหัว: คำศัพท์และไอคอนแก้ไข/ลบ */}
-      <div className="flex justify-between items-start mb-3">
-        <h2 className="text-2xl font-bold text-gray-900 flex-1 pr-2">{word}</h2>
+        {/* ส่วนหัว: คำศัพท์และไอคอนแก้ไข/ลบ */}
+        <div className="flex justify-between items-start mb-3">
+          <h2 className="text-2xl font-bold text-gray-900 flex-1 pr-2">{word}</h2>
         
         {/* ไอคอนแก้ไขและลบ */}
         <div className="flex items-center gap-1 shrink-0">
