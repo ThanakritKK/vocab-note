@@ -3,8 +3,11 @@
 import { defineConfig, env } from "prisma/config";
 import { config } from "dotenv";
 
-// Load environment variables from .env file
-config();
+// Load environment variables from .env file (only if DATABASE_URL is not already set)
+// In production (Vercel), DATABASE_URL is already available from environment variables
+if (!process.env.DATABASE_URL) {
+  config();
+}
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
