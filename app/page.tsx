@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@clerk/nextjs/server";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
+import type { Vocab } from "@prisma/client";
 
 export default async function Home(props: { 
   searchParams?: Promise<{
@@ -54,7 +55,7 @@ export default async function Home(props: {
 
       <div className="flex flex-col gap-4 w-full max-w-sm">
         {vocabList.length > 0 ? (
-          vocabList.map((vocab, index) => {
+          vocabList.map((vocab: Vocab, index) => {
             return (
               <VocabCard
                 key={index}
